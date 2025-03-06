@@ -51,7 +51,17 @@ function bps_filter_members ($querystring, $object)
 	if ($object != 'members')  return $querystring;
 
 	$request = bps_get_request ('search');
-	if (empty ($request))  return $querystring;
+	if (empty ($request) || $request[BPS_FORM] == 'clear')
+	{
+		$hide_directory = apply_filters ('bps_hide_directory', false);
+		if ($hide_directory)
+		{
+			parse_str ($querystring, $args);
+			$args['include'] = '0';
+			$querystring = http_build_query ($args);
+		}
+		return $querystring;
+	}
 
 	$results = bps_search ($request);
 	if ($results['validated'])
