@@ -40,13 +40,16 @@ function bps_set_request ()
 	}
 }
 
-function bps_get_request2 ($type, $form=0)		// published interface, 20190324
+function bps_get_request ($type, $form=0)		// published interface, 20190324
 {
 	static $saved_request = array ();
 	$form = (int)$form;
 	if (isset ($saved_request["$type-$form"]))  return $saved_request["$type-$form"];
 
 	$request = _bps_clean_request ();
+	$current = bps_current_page ();
+	$hidden_filters = bps_get_hidden_filters ();
+	$showing_errors = isset ($_REQUEST['bps_errors']);
 
 	if (!empty ($request))  switch ($type)
 	{
@@ -55,14 +58,13 @@ function bps_get_request2 ($type, $form=0)		// published interface, 20190324
 		break;
 
 	case 'filters':
-		$current = bps_current_page ();
-		$showing_errors = isset ($_REQUEST['bps_errors']);
 		if ($request['bps_directory'] != $current || $showing_errors)  $request = array ();
+		foreach ($hidden_filters as $key => $value)  unset ($request[$key]);
 		break;
 
 	case 'search':
-		$current = bps_current_page ();
-		if (empty ($request['bps_directory']) || $request['bps_directory'] != $current)  $request = array ();
+		if ($request['bps_directory'] != $current || $showing_errors)  $request = array ();
+		foreach ($hidden_filters as $key => $value)  $request[$key] = $value;
 		break;
 	}
 
@@ -97,7 +99,7 @@ function _bps_clean_request ()
 			else if ($request[BPS_FORM] == 'clear')
 				$clean = array ();					// bad cookie
 			else
-				$clean = bps_clean ($request);		// saved search
+				$clean = _bps_clean ($request);		// saved search
 		}
 	}
 	else if ($request[BPS_FORM] == 'clear')
@@ -106,21 +108,18 @@ function _bps_clean_request ()
 	}
 	else
 	{
-		$clean = bps_clean ($request);	// new search
+		$clean = _bps_clean ($request);	// new search
 	}
 
 	return $clean;
 }
 
-function bps_clean ($request)		// $request[BPS_FORM] is set and != 'clear'
+function _bps_clean ($request)		// $request[BPS_FORM] is set and != 'clear'
 {
 	$clean = array ();
 
 	$form = (int)$request[BPS_FORM];
 	$meta = bps_meta ($form);
-
-	$hidden_filters = bps_get_hidden_filters ();
-	foreach ($hidden_filters as $key => $value)  unset ($request[$key]);
 
 	foreach ($meta['field_code'] as $k => $code)
 	{

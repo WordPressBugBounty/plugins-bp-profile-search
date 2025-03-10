@@ -1,41 +1,5 @@
 <?php
 
-function bps_get_request ($type, $form=0)		// published interface, 20190324
-{
-	if ($type == 'form')  return bps_get_request2 ($type, $form);
-	if ($type == 'filters')  return bps_get_request2 ($type);
-
-	$current = bps_current_page ();
-	$hidden_filters = bps_get_hidden_filters ();
-	$showing_errors = isset ($_REQUEST['bps_errors']);
-
-	$cookie = apply_filters ('bps_cookie_name', 'bps_request');
-	$request = isset ($_REQUEST[BPS_FORM])? $_REQUEST: array ();
-	if (empty ($request) && isset ($_COOKIE[$cookie]))
-		parse_str (stripslashes ($_COOKIE[$cookie]), $request);
-
-	switch ($type)
-	{
-	case 'form':
-		if (isset ($request[BPS_FORM]) && $request[BPS_FORM] != $form)  $request = array ();
-		break;
-
-	case 'filters':
-		if (isset ($request['bps_directory']) && $request['bps_directory'] != $current)  $request = array ();
-		if ($showing_errors)  $request = array ();
-		foreach ($hidden_filters as $key => $value)  unset ($request[$key]);
-		break;
-
-	case 'search':
-		if (isset ($request['bps_directory']) && $request['bps_directory'] != $current)  $request = array ();
-		if ($showing_errors)  $request = array ();
-		foreach ($hidden_filters as $key => $value)  $request[$key] = $value;
-		break;
-	}
-
-	return apply_filters ('bps_request', $request, $type, $form);
-}
-
 function bps_current_page ()
 {
 	$current = defined ('DOING_AJAX')?
@@ -51,7 +15,7 @@ function bps_filter_members ($querystring, $object)
 	if ($object != 'members')  return $querystring;
 
 	$request = bps_get_request ('search');
-	if (empty ($request) || $request[BPS_FORM] == 'clear')
+	if (empty ($request))
 	{
 		$hide_directory = apply_filters ('bps_hide_directory', false);
 		if ($hide_directory)

@@ -198,6 +198,7 @@ function bps_usermeta_setup ($fields)
 	(
 		'first_name'			=> 'text',
 		'last_name'				=> 'text',
+		'description'			=> 'text',
 		'role'					=> array ('text', bps_get_roles ()),
 		'roles'					=> array ('set', bps_get_roles ()),
 	);
