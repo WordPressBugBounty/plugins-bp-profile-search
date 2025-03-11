@@ -51,22 +51,25 @@ function bps_get_request ($type, $form=0)		// published interface, 20190324
 	$hidden_filters = bps_get_hidden_filters ();
 	$showing_errors = isset ($_REQUEST['bps_errors']);
 
-	if (!empty ($request))  switch ($type)
+	if (!empty ($request))
 	{
-	case 'form':
-		if ($request[BPS_FORM] != $form)  $request = array ();
-		break;
+		switch ($type)
+		{
+		case 'form':
+			if ($request[BPS_FORM] != $form)  $request = array ();
+			break;
 
-	case 'filters':
-		if ($request['bps_directory'] != $current || $showing_errors)  $request = array ();
+		case 'filters':
+		case 'search':
+			if ($request['bps_directory'] != $current || $showing_errors)  $request = array ();
+			break;
+		}
+
 		foreach ($hidden_filters as $key => $value)  unset ($request[$key]);
-		break;
-
-	case 'search':
-		if ($request['bps_directory'] != $current || $showing_errors)  $request = array ();
-		foreach ($hidden_filters as $key => $value)  $request[$key] = $value;
-		break;
 	}
+
+	if ($type == 'search')
+		foreach ($hidden_filters as $key => $value)  $request[$key] = $value;
 
 	$request = apply_filters ('bps_request', $request, $type, $form);
 	if (bps_debug ())

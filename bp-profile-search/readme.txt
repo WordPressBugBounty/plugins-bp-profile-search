@@ -4,7 +4,7 @@ Tags:               buddypress, directory, members, search, users
 License:            GPLv2 or later
 Requires at least:  6.1
 Tested up to:       6.7
-Stable tag:         5.8.2
+Stable tag:         5.8.3
 
 Member search and member directories for BuddyPress and the BuddyBoss Platform.
 
@@ -116,6 +116,8 @@ Standard installation, see [Installing Plugins](https://wordpress.org/support/ar
 
 == Changelog ==
 
+= 5.8.3 =
+* Fixed: regression on [bps_directory] introduced in 5.8.2
 = 5.8.2 =
 * Fixed: special case with the hide directory option
 * Added: ability to search users biographical info
