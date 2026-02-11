@@ -3,7 +3,7 @@ Contributors:       dontdream
 Tags:               buddypress, directory, members, search, users
 License:            GPLv2 or later
 Requires at least:  6.1
-Tested up to:       6.7
+Tested up to:       6.9
 Stable tag:         5.8.3
 
 Member search and member directories for BuddyPress and the BuddyBoss Platform.
