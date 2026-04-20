@@ -4,7 +4,7 @@ Tags:               buddypress, directory, members, search, users
 License:            GPLv2 or later
 Requires at least:  6.1
 Tested up to:       6.9
-Stable tag:         5.8.3
+Stable tag:         5.9
 
 Member search and member directories for BuddyPress and the BuddyBoss Platform.
 
@@ -116,6 +116,8 @@ Standard installation, see [Installing Plugins](https://wordpress.org/support/ar
 
 == Changelog ==
 
+= 5.9 =
+* Security: removed a vulnerability, thanks to Marc Montpas from WPScan
 = 5.8.3 =
 * Fixed: regression on [bps_directory] introduced in 5.8.2
 = 5.8.2 =
@@ -447,5 +449,5 @@ Standard installation, see [Installing Plugins](https://wordpress.org/support/ar
 
 == Upgrade Notice ==
 
-= 5.8 =
+= 5.9 =
 Security release, please update immediately!

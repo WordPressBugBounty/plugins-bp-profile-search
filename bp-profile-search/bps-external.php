@@ -1,5 +1,55 @@
 <?php
 
+add_filter ('bps_add_fields', 'bps_active_setup', 99);
+function bps_active_setup ($fields)
+{
+	$f = new stdClass;
+	$f->group = __('Usermeta data', 'bp-profile-search');
+	$f->code = 'active';
+	$f->name = __('Last Active window (days)', 'bp-profile-search');
+	$f->description = __('User was last active during the specified time period', 'bp-profile-search');
+
+	$f->format = 'integer';
+	$f->options = array ();
+	$f->search = 'bps_active_search';
+
+	$fields[] = $f;
+	return $fields;
+}
+
+function bps_active_search ($f)
+{
+	global $bp, $wpdb;
+
+	$value = $f->value;
+	$filter = $f->format. '_'.  ($f->filter == ''? 'is': $f->filter);
+
+	$sql = array ('select' => '', 'where' => array ());
+	$sql['select'] = "SELECT DISTINCT user_id FROM {$bp->activity->table_name}";
+	$sql['where']['type'] = "type = 'last_activity'";
+
+	switch ($filter)
+	{
+	case 'integer_is':
+		$sql['where']['active'] = $wpdb->prepare ("DATEDIFF(CURDATE(), date_recorded) <= %d", $value);
+		break;
+
+	case 'integer_range':
+		if (isset ($value['min']))  $sql['where']['active_min'] = $wpdb->prepare ("DATEDIFF(CURDATE(), date_recorded) >= %d", $value['min']);
+		if (isset ($value['max']))  $sql['where']['active_max'] = $wpdb->prepare ("DATEDIFF(CURDATE(), date_recorded) <= %d", $value['max']);
+		break;
+
+	default:
+		return array ();
+	}
+
+	$sql = apply_filters ('bps_field_sql', $sql, $f);
+	$query = $sql['select']. ' WHERE '. implode (' AND ', $sql['where']);
+
+	$results = $wpdb->get_col ($query);
+	return $results;
+}
+
 add_filter ('bps_add_fields', 'bps_groups_setup', 99);
 function bps_groups_setup ($fields)
 {
@@ -51,8 +101,15 @@ function bps_groups_search ($f)
 	{
 	case 'set_match_any':
 	case 'set_match_single':
-		$values = implode (', ', (array)$value);
-		$sql['where'][$filter] = "group_id IN ($values)";
+		$values = (array)$value;
+		$groups = array ();
+		foreach ($values as $value)
+			if (ctype_digit ($value))  $groups[] = $value;
+
+		if (count ($groups) == 0)  return array ();
+
+		$groups = implode (', ', $groups);
+		$sql['where'][$filter] = "group_id IN ($groups)";
 		break;
 
 	default:
